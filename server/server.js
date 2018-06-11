@@ -30,23 +30,29 @@ io.on('connection', (socket) => {
 		users.addUser(socket.id, params.name, params.room);
 		io.to(params.room).emit('updateUserList', users.getUserList(params.room));
 
-
-		socket.emit('newMessage', generateMessage('Admin', 'Welcome to the Chat App'));
+		socket.emit('newMessage', generateMessage('Admin', `Welcome ${params.name}. Happy chatting !`));
 		socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin',`${params.name} has joined`));
 
 		callback();
 	});
 
 	socket.on('createMessage', (msg, callback) => {
-		console.log('create Message', msg);
+		var user = users.getUser(socket.id);
 
-		io.emit('newMessage', generateMessage(msg.from,msg.text));
+		if(user && isRealString(msg.text)) {
+			io.to(user.room).emit('newMessage', generateMessage(user.name,msg.text));
+		}
 
 		callback();	//Acknowledgement
 	});
 
 	socket.on('createLocationMessage', (coords) => {
-		io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude,coords.longitude));
+		var user = users.getUser(socket.id);
+
+		if(user) {
+			io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude,coords.longitude));
+		}
+
 	});
 
 	socket.on('disconnect', () => {
