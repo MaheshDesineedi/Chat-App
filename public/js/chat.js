@@ -15,6 +15,7 @@ function scrollToBottom () {
 		messages.scrollTop(scrollHeight);
 	}
 };
+scrollToBottom();
 
 socket.on('connect', function () {
 	var params = jQuery.deparam(window.location.search);
@@ -104,3 +105,4 @@ locationButton.on('click', function() {
 		return alert('Unable to fetch position');
 	});
 });
+
